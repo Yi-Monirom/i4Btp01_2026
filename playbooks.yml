@@ -5,8 +5,8 @@
     deploy_path: /var/www/YI_MONIROM
     repo_url: https://github.com/Yi-Monirom/i4Btp01_2026.git
   tasks:
-    - name: add saft
-      command: git config --global --add safe.directory {{ deploy_path }
+    - name: Add git safe directory
+      command: "git config --global --add safe.directory {{ deploy_path }}"
 
     - name: clone repo
       git:
