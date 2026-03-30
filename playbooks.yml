@@ -100,19 +100,19 @@
         - Enable Nginx site
 
   handlers:
-    - name: Enable Nginx site
-      block:
-        - name: Link site to sites-enabled
-          file:
-            src: /etc/nginx/sites-available/YI_MONIROM
-            dest: /etc/nginx/sites-enabled/YI_MONIROM
-            state: link
-            force: yes
+  - name: Enable Nginx site
+    block:
+      - name: Link site to sites-enabled
+        file:
+          src: /etc/nginx/sites-available/YI_MONIROM
+          dest: /etc/nginx/sites-enabled/YI_MONIROM
+          state: link
+          force: yes
 
-        - name: Test Nginx configuration
-          command: nginx -t
+      - name: Test Nginx configuration
+        command: nginx -t
 
-        - name: Reload Nginx
-          service:
-            name: nginx
-            state: reloaded
+      - name: Reload Nginx
+        service:
+          name: nginx
+          state: reloaded
