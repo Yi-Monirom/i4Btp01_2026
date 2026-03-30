@@ -66,53 +66,10 @@
         group: www-data
         recurse: yes
 
-    # 🔟 Configure Nginx for Laravel subfolder
-    - name: Configure Nginx for YI_MONIROM
-      copy:
-        dest: /etc/nginx/sites-available/YI_MONIROM
-        content: 
-          server {
-              listen 80;
-              server_name {{ server_name }};
-
-              root {{ deploy_path }}/public;
-              index index.php index.html;
-
-              location /YI_MONIROM/ {
-                  alias /{{ deploy_path }}/public/;
-                  index index.php;
-                  try_files $uri $uri/ /index.php?$query_string;
-
-                  location ~ ^/YI_MONIROM/(.+\.php)$ {
-                      alias /{{ deploy_path }}/public/$1;
-                      fastcgi_pass unix:/run/php/php8.4-fpm.sock;
-                      fastcgi_index index.php;
-                      include fastcgi_params;
-                      fastcgi_param SCRIPT_FILENAME {{ deploy_path }}/public/$1;
-                  }
-              }
-
-              location ~ /\.ht {
-                  deny all;
-              }
-          }
-      notify:
-        - Enable Nginx site
-
-  handlers:
-  - name: Enable Nginx site
-    block:
-      - name: Link site to sites-enabled
-        file:
-          src: /etc/nginx/sites-available/YI_MONIROM
-          dest: /etc/nginx/sites-enabled/YI_MONIROM
-          state: link
-          force: yes
-
-      - name: Test Nginx configuration
-        command: nginx -t
-
-      - name: Reload Nginx
-        service:
-          name: nginx
-          state: reloaded
+    - name: Create SQLite database file
+      file:
+        path: "{{ deploy_path }}/database/database.sqlite"
+        state: touch
+        owner: www-data
+        group: www-data
+        mode: '0664'
