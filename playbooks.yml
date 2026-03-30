@@ -7,30 +7,15 @@
     server_name: 178.128.93.188
 
   tasks:
+    - name: Add safe directory for git
+      command: git config --global --add safe.directory {{ deploy_path }}
 
-    - name: Clone repository
+    - name: Clone or update Laravel project
       git:
         repo: "{{ repo_url }}"
         dest: "{{ deploy_path }}"
+        version: main
         force: yes
-
-    - name: Add git safe directory
-      command: "git config --global --add safe.directory {{ deploy_path }}"
-
-    - name: Create SQLite database file
-      file:
-        path: "{{ deploy_path }}/database/database.sqlite"
-        state: touch
-        owner: www-data
-        group: www-data
-        mode: '0664'
-
-    - name: Copy .env file
-      copy:
-        src: "{{ deploy_path }}/.env.example"
-        dest: "{{ deploy_path }}/.env"
-        remote_src: yes
-        force: no
 
     - name: Install Composer dependencies
       command: composer install --no-dev --no-interaction
@@ -39,17 +24,34 @@
       environment:
         COMPOSER_ALLOW_SUPERUSER: "1"
 
-    - name: Generate Laravel key
-      command: php8.4 artisan key:generate --force
+    - name: Copy .env file
+      copy:
+        src: "{{ deploy_path }}/.env.example"
+        dest: "{{ deploy_path }}/.env"
+        remote_src: yes
+        force: no
+
+    - name: Generate application key
+      command: php artisan key:generate
       args:
         chdir: "{{ deploy_path }}"
 
-    - name: Install Node modules
+    - name: Create SQLite database
+      file:
+        path: "{{ deploy_path }}/database/database.sqlite"
+        state: touch
+
+    - name: Run database migrations
+      command: php artisan migrate --force
+      args:
+        chdir: "{{ deploy_path }}"
+
+    - name: Install NPM dependencies
       command: npm install
       args:
         chdir: "{{ deploy_path }}"
 
-    - name: Build assets
+    - name: Build frontend assets
       command: npm run build
       args:
         chdir: "{{ deploy_path }}"
