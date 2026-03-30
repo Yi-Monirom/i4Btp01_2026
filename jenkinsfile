@@ -2,7 +2,7 @@ pipeline {
     agent {
         label 'agent1'
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
@@ -48,12 +48,12 @@ pipeline {
     post {
         success {
             def message = "deploy successfully "
-            sh "curl -s -X POST https://api.telegram.org/bot$8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='${message}'"
+            sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='${message}'"
             echo 'All tests passed! CI/CD pipeline completed successfully.'
         }
         failure {
             def message = "deploy Unsuccessfully"
-            sh "curl -s -X POST https://api.telegram.org/bot$8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='${message}'"
+            sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='${message}'"
             echo 'Pipeline failed. Check logs for details.'
         }
     }
