@@ -4,67 +4,37 @@
   vars:
     deploy_path: /var/www/YI_MONIROM
     repo_url: https://github.com/Yi-Monirom/i4Btp01_2026.git
-    server_name: 178.128.93.188  # change to your IP or domain
+    server_name: 178.128.93.188
 
   tasks:
-    # 1️⃣ Remove old repo
+    - name: Install PHP 8.4 and required extensions
+      apt:
+        name:
+          - php8.4
+          - php8.4-cli
+          - php8.4-fpm
+          - php8.4-mbstring
+          - php8.4-xml
+          - php8.4-curl
+          - php8.4-bcmath
+          - php8.4-zip
+          - php8.4-sqlite3
+        state: present
+        update_cache: yes
+
     - name: Delete old repository
       file:
         path: "{{ deploy_path }}"
         state: absent
 
-    # 2️⃣ Clone repository
     - name: Clone repository
       git:
         repo: "{{ repo_url }}"
         dest: "{{ deploy_path }}"
         force: yes
 
-    # 3️⃣ Git safe directory
     - name: Add git safe directory
       command: "git config --global --add safe.directory {{ deploy_path }}"
-
-    # 4️⃣ Composer dependencies
-    - name: Install Composer dependencies
-      command: composer install --no-dev --no-interaction
-      args:
-        chdir: "{{ deploy_path }}"
-      environment:
-        COMPOSER_ALLOW_SUPERUSER: "1"
-
-    # 5️⃣ Copy .env
-    - name: Copy .env file
-      copy:
-        src: "{{ deploy_path }}/.env.example"
-        dest: "{{ deploy_path }}/.env"
-        remote_src: yes
-        force: no
-
-    # 6️⃣ Generate Laravel key
-    - name: Generate Laravel key
-      command: php artisan key:generate --force
-      args:
-        chdir: "{{ deploy_path }}"
-
-    # 7️⃣ Install Node modules
-    - name: Install Node modules
-      command: npm install
-      args:
-        chdir: "{{ deploy_path }}"
-
-    # 8️⃣ Build assets
-    - name: Build assets
-      command: npm run build
-      args:
-        chdir: "{{ deploy_path }}"
-
-    # 9️⃣ Set permissions
-    - name: Set permissions
-      file:
-        path: "{{ deploy_path }}"
-        owner: www-data
-        group: www-data
-        recurse: yes
 
     - name: Create SQLite database file
       file:
@@ -73,3 +43,39 @@
         owner: www-data
         group: www-data
         mode: '0664'
+
+    - name: Copy .env file
+      copy:
+        src: "{{ deploy_path }}/.env.example"
+        dest: "{{ deploy_path }}/.env"
+        remote_src: yes
+        force: no
+
+    - name: Install Composer dependencies
+      command: /usr/bin/php8.4 /usr/local/bin/composer install --no-dev --no-interaction
+      args:
+        chdir: "{{ deploy_path }}"
+      environment:
+        COMPOSER_ALLOW_SUPERUSER: "1"
+
+    - name: Generate Laravel key
+      command: php8.4 artisan key:generate --force
+      args:
+        chdir: "{{ deploy_path }}"
+
+    - name: Install Node modules
+      command: npm install
+      args:
+        chdir: "{{ deploy_path }}"
+
+    - name: Build assets
+      command: npm run build
+      args:
+        chdir: "{{ deploy_path }}"
+
+    - name: Set permissions
+      file:
+        path: "{{ deploy_path }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
