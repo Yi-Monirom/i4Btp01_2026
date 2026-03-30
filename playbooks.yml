@@ -3,7 +3,12 @@
   become: yes
   vars:
     deploy_path: /var/www/YI_MONIROM
-    repo_url: https://github.com/Yi-Monirom/i4Btp01_2026.git
+    repo_url: https://github.com/HoklengPro/DevOps2026_2027_Lab-.git
+  tasks:
+    - name: delete old repo
+      path: 
+        path: "{{ deploy_path }}"
+        state: absent
   tasks:
     - name: Add git safe directory
       command: "git config --global --add safe.directory {{ deploy_path }}"
@@ -25,7 +30,7 @@
         dest: "{{ deploy_path }}/.env"
         remote_src: yes
         force: no
-        
+
     - name: Generate app
       command: php artisan key:generate
       args:
