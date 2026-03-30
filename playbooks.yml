@@ -25,6 +25,7 @@
         dest: "{{ deploy_path }}/.env"
         remote_src: yes
         force: no
+        
     - name: Generate app
       command: php artisan key:generate
       args:
