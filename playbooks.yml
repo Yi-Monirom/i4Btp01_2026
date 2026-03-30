@@ -19,13 +19,17 @@
         chdir: "{{ deploy_path}}"
       environment:
         COMPOSER_ALLOW_SUPERUSER: "1"
-    # - name: Copy .env
+    - name: Copy .env file
+      copy:
+        src: "{{ deploy_path }}/.env.example"
+        dest: "{{ deploy_path }}/.env"
+        remote_src: yes
+        force: no
     - name: Generate app
       command: php artisan key:generate
       args:
         chdir: "{{ deploy_path }}"
-    # - name: create db
-    # - name: run databse migrate
+    
     - name: Install compoaser
       command: npm install 
       args:
