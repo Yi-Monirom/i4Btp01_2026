@@ -70,7 +70,7 @@
     - name: Configure Nginx for YI_MONIROM
       copy:
         dest: /etc/nginx/sites-available/YI_MONIROM
-        content: |
+        content: 
           server {
               listen 80;
               server_name {{ server_name }};
@@ -79,12 +79,12 @@
               index index.php index.html;
 
               location /YI_MONIROM/ {
-                  alias {{ deploy_path }}/public/;
+                  alias /{{ deploy_path }}/public/;
                   index index.php;
                   try_files $uri $uri/ /index.php?$query_string;
 
                   location ~ ^/YI_MONIROM/(.+\.php)$ {
-                      alias {{ deploy_path }}/public/$1;
+                      alias /{{ deploy_path }}/public/$1;
                       fastcgi_pass unix:/run/php/php8.4-fpm.sock;
                       fastcgi_index index.php;
                       include fastcgi_params;
