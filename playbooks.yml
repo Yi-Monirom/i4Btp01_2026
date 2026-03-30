@@ -1,0 +1,44 @@
+- name: Deplay Laravel 
+  hosts: server
+  become: yes
+  vars:
+    deploy_path: /var/www/YI_MONIROM
+    repo_url: https://github.com/Yi-Monirom/i4Btp01_2026.git
+  tasks:
+    - name: add saft
+      command: git config --global --add safe.directory {{ deploy_path }
+
+    - name: clone repo
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ deploy_path }}"
+        force: yes
+    - name: Install compposer
+      command: composer install --no-dev --no-interaction
+      args:
+        chdir: "{{ deploy_path}}"
+      environment:
+        COMPOSER_ALLOW_SUPERUSER: "1"
+    # - name: Copy .env
+    - name: Generate app
+      command: php artisan key:generate
+      args:
+        chdir: "{{ deploy_path }}"
+    # - name: create db
+    # - name: run databse migrate
+    - name: Install compoaser
+      command: npm install 
+      args:
+        chdir: "{{ deploy_path }}"
+      
+    - name: build
+      command: npm run build
+      args:
+        chdir: "{{ deploy_path }}"
+    - name: Set permissions
+      file:
+        path: "{{ deploy_path }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
+      
