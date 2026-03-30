@@ -4,12 +4,14 @@
   vars:
     deploy_path: /var/www/YI_MONIROM
     repo_url: https://github.com/HoklengPro/DevOps2026_2027_Lab-.git
+
+    
   tasks:
     - name: delete old repo
       path: 
         path: "{{ deploy_path }}"
         state: absent
-  tasks:
+        
     - name: Add git safe directory
       command: "git config --global --add safe.directory {{ deploy_path }}"
 
