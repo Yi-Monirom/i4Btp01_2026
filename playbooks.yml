@@ -8,10 +8,9 @@
     
   tasks:
     - name: delete old repo
-      path: 
-        path: "{{ deploy_path }}"
-        state: absent
-        
+      path: "{{ deploy_path }}"
+      state: absent
+
     - name: Add git safe directory
       command: "git config --global --add safe.directory {{ deploy_path }}"
 
