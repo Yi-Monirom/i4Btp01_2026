@@ -2,15 +2,8 @@ pipeline {
     agent {
         label 'agent1'
     }
-
-    environment {
-        TELEGRAM_TOKEN = credentials('telegram-bot-token')   // Jenkins Credential ID
-        TELEGRAM_CHAT_ID = '1442383271'
-        EMAIL_TO = 'moniromyi@gmail.com'
-    }
-
+    
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -52,56 +45,56 @@ pipeline {
         }
     }
 
-    post {
+post {
 
-        success {
-            // ✅ Email
-            emailext (
-                to: "${EMAIL_TO}",
-                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-<h2 style="color:green;">Build Successful</h2>
+    success {
+        mail(
+            to: 'zenocoder101@gmail.com',
+            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Build Success
 
-<p><b>Job:</b> ${env.JOB_NAME}</p>
-<p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+Branch: laravel
 
-<p><a href="${env.BUILD_URL}">View Build Logs</a></p>
+Build URL:
+${env.BUILD_URL}
 """
-            )
-
-            // ✅ Telegram
-            sh """
-                curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
-                -d chat_id=${TELEGRAM_CHAT_ID} \
-                -d text="✅ Deploy Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            """
-
-            echo 'All tests passed! CI/CD pipeline completed successfully.'
-        }
-
-        failure {
-            // ❌ Email
-            emailext (
-                to: "${EMAIL_TO}",
-                subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-<h2 style="color:red;">Build Failed</h2>
-
-<p><b>Job:</b> ${env.JOB_NAME}</p>
-<p><b>Build:</b> #${env.BUILD_NUMBER}</p>
-
-<p><a href="${env.BUILD_URL}">View Build Logs</a></p>
-"""
-            )
-
-            // ❌ Telegram
-            sh """
-                curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
-                -d chat_id=${TELEGRAM_CHAT_ID} \
-                -d text="❌ Deploy Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            """
-
-            echo 'Pipeline failed. Check logs for details.'
-        }
+        )
     }
+
+    failure {
+        mail(
+            to: 'zenocoder101@gmail.com',
+            subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Build Failed
+
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+
+Build Logs:
+${env.BUILD_URL}
+"""
+        )
+    }
+
+    unstable {
+        mail(
+            to: 'zenocoder101@gmail.com',
+            subject: "UNSTABLE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Build Unstable
+
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+
+Build URL:
+${env.BUILD_URL}
+"""
+        )
+    }
+}
+
 }
