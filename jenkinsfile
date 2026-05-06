@@ -49,7 +49,16 @@ pipeline {
         success {
             mail(
                 to: 'moniromyi@gmail.com',
-                suject: "Success"
+                suject: "Success",
+                body: """
+                    Build Success
+
+                    Job: ${env.JOB_NAME}
+                    Build: #${env.BUILD_NUMBER}
+
+                    Build Logs:
+                    ${env.BUILD_URL}
+                    """
 
             )
             sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='deploy success'"
@@ -58,7 +67,16 @@ pipeline {
         failure {
             mail(
                 to: 'moniromyi@gmail.com',
-                suject: "Success"
+                suject: "Success",
+                body: """
+                    Build Failed
+
+                    Job: ${env.JOB_NAME}
+                    Build: #${env.BUILD_NUMBER}
+
+                    Build Logs:
+                    ${env.BUILD_URL}
+"""
             )
             
             sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='deploy fail'"
