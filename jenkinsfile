@@ -2,8 +2,15 @@ pipeline {
     agent {
         label 'agent1'
     }
-    
+
+    environment {
+        TELEGRAM_TOKEN = credentials('telegram-bot-token')   // Jenkins Credential ID
+        TELEGRAM_CHAT_ID = '1442383271'
+        EMAIL_TO = 'moniromyi@gmail.com'
+    }
+
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -46,40 +53,54 @@ pipeline {
     }
 
     post {
+
         success {
-            mail(
-                to: 'moniromyi@gmail.com',
-                suject: "Success",
+            // ✅ Email
+            emailext (
+                to: "${EMAIL_TO}",
+                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
-                    Build Success
+<h2 style="color:green;">Build Successful</h2>
 
-                    Job: ${env.JOB_NAME}
-                    Build: #${env.BUILD_NUMBER}
+<p><b>Job:</b> ${env.JOB_NAME}</p>
+<p><b>Build:</b> #${env.BUILD_NUMBER}</p>
 
-                    Build Logs:
-                    ${env.BUILD_URL}
-                    """
-
-            )
-            sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='deploy success'"
-            echo 'All tests passed! CI/CD pipeline completed successfully.'
-        }
-        failure {
-            mail(
-                to: 'moniromyi@gmail.com',
-                suject: "Success",
-                body: """
-                    Build Failed
-
-                    Job: ${env.JOB_NAME}
-                    Build: #${env.BUILD_NUMBER}
-
-                    Build Logs:
-                    ${env.BUILD_URL}
+<p><a href="${env.BUILD_URL}">View Build Logs</a></p>
 """
             )
-            
-            sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='deploy fail'"
+
+            // ✅ Telegram
+            sh """
+                curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
+                -d chat_id=${TELEGRAM_CHAT_ID} \
+                -d text="✅ Deploy Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            """
+
+            echo 'All tests passed! CI/CD pipeline completed successfully.'
+        }
+
+        failure {
+            // ❌ Email
+            emailext (
+                to: "${EMAIL_TO}",
+                subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+<h2 style="color:red;">Build Failed</h2>
+
+<p><b>Job:</b> ${env.JOB_NAME}</p>
+<p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+
+<p><a href="${env.BUILD_URL}">View Build Logs</a></p>
+"""
+            )
+
+            // ❌ Telegram
+            sh """
+                curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
+                -d chat_id=${TELEGRAM_CHAT_ID} \
+                -d text="❌ Deploy Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            """
+
             echo 'Pipeline failed. Check logs for details.'
         }
     }
