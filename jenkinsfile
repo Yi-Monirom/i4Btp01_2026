@@ -47,11 +47,19 @@ pipeline {
 
     post {
         success {
-            
+            mail(
+                to: 'moniromyi@gmail.com',
+                suject: "Success"
+
+            )
             sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='deploy success'"
             echo 'All tests passed! CI/CD pipeline completed successfully.'
         }
         failure {
+            mail(
+                to: 'moniromyi@gmail.com',
+                suject: "Success"
+            )
             
             sh "curl -s -X POST https://api.telegram.org/bot8612978489:AAE9XKdKkNt9df3XZ5s1u69WLLP4vUFAk9o/sendMessage -d chat_id=1442383271 -d text='deploy fail'"
             echo 'Pipeline failed. Check logs for details.'

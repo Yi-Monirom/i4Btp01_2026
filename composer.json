@@ -87,6 +87,13 @@
             "php-http/discovery": true
         }
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://192.168.123.41:8082/repository/yi_monirom_composer_proxxy"
+        }
+    ],
+
     "minimum-stability": "stable",
     "prefer-stable": true
 }
